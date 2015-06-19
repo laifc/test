@@ -1,4 +1,4 @@
-wyphtonобть
+wyphtonобть1
 http://www.wxpython.org/download.php
 
 py2exe

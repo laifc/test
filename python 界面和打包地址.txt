@@ -1,0 +1,148 @@
+wyphton下载
+http://www.wxpython.org/download.php
+
+py2exe
+http://sourceforge.net/projects/py2exe/files/py2exe/
+
+
+py2exe打包步骤
+1、新建一个文件py2exe 存放mysetup.py和打包的对象xxx.py   
+2、新建一个mysetup.py，有类似模版 确定带图标或者不带图标 指定打包对象为xxx/py2exe/1.py  要加上文件路径
+3、将打包对象xxx.py拷贝到文件夹py2exe中，并且重命名为1.py
+4、在cmd命令下 运行 python xxx/py2exe/mysetup.py py2exe   mysetup要加上全路径  或者直接将文件加入到环境变量
+5、执行后查询python安装目录下查看是否生成dist文件夹   我是生成在 C:\Users\myuser\dist目录下
+6、需要发送给其他pc使用，需要将整个文件夹发给别人   如果脚本已经将依赖库都封装到exe中也可以直接发送exe文件
+
+
+
+
+
+带程序图标的打包--成功例子
+# mysetup.py
+from distutils.core import setup
+import py2exe
+# 带图标的exe
+setup(windows=[{"script":"main_analysis.py","icon_resources": [(1, "1.ico")]}])
+
+#不带图标的exe
+setup(console=["helloworld.py"])
+
+如下是一些论坛上的:
+如果你有一个名为helloworld.py的python脚本，你想把它转换为运行在windows上的可执行程序，并运行在没有安装python的windows系统上，那么首先你应写一个用于发布程序的设置脚本例如mysetup.py，在其中的setup函数前插入语句import py2exe 。
+mysetup.py示例如下:
+# mysetup.py
+from distutils.core import setup
+import py2exe
+
+setup(console=["helloworld.py"])
+然后按下面的方法运行mysetup.py:
+python mysetup.py py2exe
+上面的命令执行后将产生一个名为dist的子目录，其中包含了helloworld.exe,python24.dll,library.zip这些文件。
+如果你的helloworld.py脚本中用了已编译的C扩展模块，那么这些模块也会被拷贝在个子目录中，同样，所有的dll文件在运行时都是需要的，除了系统的dll文件。
+dist子目录中的文件包含了你的程序所必须的东西，你应将这个子目录中的所有内容一起发布。
+
+默认情况下，py2exe在目录dist下创建以下这些必须的文件：
+1、一个或多个exe文件。
+2、python##.dll。 
+3、几个.pyd文件，它们是已编译的扩展名，它们是exe文件所需要的；加上其它的.dll文件，这些.dll是.pyd所需要的。
+4、一个library.zip文件，它包含了已编译的纯的python模块如.pyc或.pyo
+上面的mysetup.py创建了一个控制台的helloword.exe程序，如果你要创建一个图形用户界的程序，那么你只需要将mysetup.py中的console=["helloworld.py"]替换为windows=["myscript.py"]既可。
+
+py2exe一次能够创建多个exe文件，你需要将这些脚本文件的列表传递给console或windows的关键字参数。如果你有几个相关联的脚本，那么这是很有用的。
+运行下面个命令，将显示py2exe命令的所有命令行标记。
+python mysetup.py py2exe --help
+
+四、指定额外的文件
+一些应用程序在运行时需要额外的文件，诸如配置文件、字体、位图。
+如果在安装脚本中用data_files可选项指定了那些额外的文件，那么py2exe能将这些文件拷贝到dist子目录中。data_files应包含一个元组(target-dir, files)列表，其中的files是这些额外的文件的列表。
+示例如下：
+# mysetup.py
+from distutils.core import setup
+import glob
+import py2exe
+
+setup(console=["helloworld.py"],
+      data_files=[("bitmaps",
+                   ["bm/large.gif", "bm/small.gif"]),
+                  ("fonts",
+                   glob.glob("fonts\\*.fnt"))],
+)
+说明：data_files选项将创建一个子目录dist\bitmaps，其中包含两个.gif文件；一个子目录dist\fonts，其中包含了所有的.fnt文件。
+
+五、Windows NT services
+
+你可以通过传递一个service关键字参数给setup函数来建造Windows NT services
+,这个service参数的值必须是一个Python模块名(包含一service类)的列表。
+示例如下：
+# mysetup.py
+from distutils.core import setup
+import py2exe
+
+setup(service=["MyService"])
+所建造的可执行的service是可以通过在其后跟一定的命令行参数标记来自行安装和卸载的。你可以通过在这个可执行的service(exe)后跟一-help参数来得到更多的帮助。
+六、COM servers
+
+你可以通过传递一个com_server 关键字参数给setup函数来建造Windows NT services
+,这个service参数的值必须是一个Python模块名(包含一个或多个COM server 类)的列表。
+示例如下：
+# mysetup.py
+from distutils.core import setup
+import py2exe
+
+setup(com_server=["win32com.server.interp"])
+默认情况下，DLL和EXE servers被建造，你不需要它们的话你可以简单的删除它们。
+
+
+七、本人补充
+补充一下，如果要把python编译的所有文件打包到一个exe中，就需要在setup()这个函数中，要设置2个参数：options中的bundle_files和zipfile。
+其中bundle_files有效值为：
+3 (默认)不打包。
+2 打包，但不打包Python解释器。
+1 打包，包括Python解释器。
+example:
+ 
+
+1	options = {"py2exe":{"bundle_files": 1}}
+zipfile的有效值为:
+不填(默认) 生成一个library.zip文件
+None 把所有东西打包进.exe文件中
+贴一个自己写的代码
+ 
+
+01	#! /usr/bin/env python  
+
+02	# -*- coding: utf-8 -*-  
+
+03	  
+
+04	#安装成windows服务的python脚本 
+
+05	#内容： 
+
+07	from distutils.core import setup 
+
+08	import py2exe 
+
+09	  
+
+10	options = {"py2exe":{"compressed": 1, #压缩   
+
+11	        "optimize": 2,  
+
+12	        "bundle_files": 1 #所有文件打包成一个exe文件 
+
+13	}}    
+
+14	  
+
+15	setup( 
+
+16	    service=["PyWindowsService"], 
+
+17	    options=options, 
+
+18	    zipfile=None)
+
+
+
+
